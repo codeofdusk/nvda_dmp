@@ -1,5 +1,4 @@
-"""A proxy to allow NVDA to use diff-match-patch without linking
-for licensing reasons.
+"""A utility to calculate text insersions using Diff Match Patch.
 Copyright 2020 Bill Dengler
 
 licensed under the Apache licence, Version 2.0 (the "licence") with specific authorization to be distributed with NVDA;

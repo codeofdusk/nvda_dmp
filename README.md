@@ -1,5 +1,5 @@
 # NVDA_dmp
-A proxy to allow NVDA to use [diff-match-patch](https://github.com/JoshData/diff_match_patch-python) without linking for [licensing reasons](https://www.apache.org/licenses/GPL-compatibility.html).
+A utility to calculate text insersions using Diff Match Patch.
 
 Copyright 2020 Bill Dengler, licensed under [apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) with explicit authorization to be distrinbuted with the [NVDA screen reader](https://nvaccess.org).
 
