@@ -30,7 +30,7 @@ if __name__ == "__main__":
         for op, text in diff(oldText, newText, counts_only=False):
             if op == "+":
                 res += text
-                if not (text.endswith("\r") or text.endswith("\n")):
+                if not text.endswith(("\n", "\r")):
                     res += "\n"
         sys.stdout.buffer.write(struct.pack("=I", len(res)))
         sys.stdout.buffer.write(res.encode("utf-8"))
