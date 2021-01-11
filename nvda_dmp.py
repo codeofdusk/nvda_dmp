@@ -32,7 +32,8 @@ if __name__ == "__main__":
                 res += text
                 if not text.endswith(("\n", "\r")):
                     res += "\n"
+        res = res.encode("utf-8")
         sys.stdout.buffer.write(struct.pack("=I", len(res)))
-        sys.stdout.buffer.write(res.encode("utf-8"))
+        sys.stdout.buffer.write(res)
         sys.stdin.flush()
         sys.stdout.flush()
