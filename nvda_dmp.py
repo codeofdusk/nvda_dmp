@@ -19,11 +19,11 @@ import sys
 from diff_match_patch import diff
 
 
-def char_mode(oldText, newText):
+def _char_mode(oldText, newText):
     return diff(oldText, newText, counts_only=False)
 
 
-def dmp_linesToChars(text1, text2):
+def _dmp_linesToChars(text1, text2):
     """Based on the Google DMP Python implementation. Split two texts into an array of strings.  Reduce the texts to a string
     of hashes where each Unicode character represents one line.
 
@@ -43,7 +43,7 @@ def dmp_linesToChars(text1, text2):
     # So we'll insert a junk entry to avoid generating a null character.
     lineArray.append("")
 
-    def dmp_linesToCharsMunge(text):
+    def _dmp_linesToCharsMunge(text):
         """Split a text into an array of strings.  Reduce the texts to a string
         of hashes where each Unicode character represents one line.
         Modifies linearray and linehash through being a closure.
@@ -81,13 +81,13 @@ def dmp_linesToChars(text1, text2):
 
     # Allocate 2/3rds of the space for text1, the rest for text2.
     maxLines = 666666
-    chars1 = dmp_linesToCharsMunge(text1)
+    chars1 = _dmp_linesToCharsMunge(text1)
     maxLines = 1114111
-    chars2 = dmp_linesToCharsMunge(text2)
+    chars2 = _dmp_linesToCharsMunge(text2)
     return (chars1, chars2, lineArray)
 
 
-def dmp_charsToLines(diffs, lineArray):
+def _dmp_charsToLines(diffs, lineArray):
     """From the Google DMP Python implementation. Rehydrate the text in a diff from a string of line hashes to real lines
     of text.
 
@@ -102,25 +102,25 @@ def dmp_charsToLines(diffs, lineArray):
         diffs[i] = (diffs[i][0], "".join(text))
 
 
-def line_mode(oldText, newText):
-    t1, t2, lines = dmp_linesToChars(oldText, newText)
+def _line_mode(oldText, newText):
+    t1, t2, lines = _dmp_linesToChars(oldText, newText)
     diffs = diff(t1, t2, counts_only=False, cleanup_semantic=False)
-    dmp_charsToLines(diffs, lines)
+    _dmp_charsToLines(diffs, lines)
     return diffs
 
 
-def hybrid_mode(oldText, newText):
+def _hybrid_mode(oldText, newText):
     "Returns both either a character- or line-mode diff (as appropriate) and a boolean (True if line-based was used, False otherwise)."
-    linemode = line_mode(oldText, newText)
+    linemode = _line_mode(oldText, newText)
     # If only one line was inserted, we want to know exactly what changed.
     # Fall back to a character diff.
     if len([i for i in linemode if i[0] == "+"]) == 1:
-        return (char_mode(oldText, newText), False)
+        return (_char_mode(oldText, newText), False)
     else:
         return (linemode, True)
 
 
-def get_new(diff_tuples, allow_equal=False):
+def _get_new(diff_tuples, allow_equal=False):
     "Given a list of diff tuples in the form returned by DMP, returns a string containing text that is present in newText but not in oldText."
     res = ""
     for i, (op, text) in enumerate(diff_tuples):
@@ -131,6 +131,13 @@ def get_new(diff_tuples, allow_equal=False):
     return res
 
 
+def diff_nvda(oldText, newText):
+    "Given oldText and newText, returns a string containing the newly-added text to present. Higher-level applications (such as NVDA) and the binary inter-process protocol should call this."
+    diffs, allow_equal = _hybrid_mode(oldText, newText)
+    res = _get_new(diffs, allow_equal)
+    return res
+
+
 if __name__ == "__main__":
     while True:
         oldLen, newLen = struct.unpack("=II", sys.stdin.buffer.read(8))
@@ -138,8 +145,7 @@ if __name__ == "__main__":
             break  # sentinal value
         oldText = sys.stdin.buffer.read(oldLen).decode("utf-8")
         newText = sys.stdin.buffer.read(newLen).decode("utf-8")
-        diffs, allow_equal = hybrid_mode(oldText, newText)
-        res = get_new(diffs, allow_equal).encode("utf-8")
+        res = diff_nvda(oldText, newText).encode("utf-8")
         sys.stdout.buffer.write(struct.pack("=I", len(res)))
         sys.stdout.buffer.write(res)
         sys.stdin.flush()
