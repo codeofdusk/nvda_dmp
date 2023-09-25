@@ -16,7 +16,7 @@ limitations under the licence."""
 import struct
 import sys
 
-from diff_match_patch import diff
+from fast_diff_match_patch import diff
 
 
 if __name__ == "__main__":
