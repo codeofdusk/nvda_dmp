@@ -35,7 +35,6 @@ def main():
                     res += b"\n"
         sys.stdout.buffer.write(struct.pack("=I", len(res)))
         sys.stdout.buffer.write(res)
-        sys.stdin.flush()
         sys.stdout.flush()
 
 
