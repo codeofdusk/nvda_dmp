@@ -1,7 +1,8 @@
 """A utility to calculate text insersions using Diff Match Patch.
 Copyright 2020 Bill Dengler
 
-licensed under the Apache licence, Version 2.0 (the "licence") with specific authorization to be distributed with NVDA;
+licensed under the Apache licence, Version 2.0 (the "licence") with specific
+authorization to be distributed with NVDA;
 you may not use this file except in compliance with the licence.
 You may obtain a copy of the licence at
 
@@ -19,7 +20,7 @@ import sys
 from fast_diff_match_patch import diff
 
 
-def main():
+if __name__ == "__main__":
     goodLineEndings = (b"\n", b"\r")
     while True:
         oldLen, newLen = struct.unpack("=II", sys.stdin.buffer.read(8))
@@ -36,7 +37,3 @@ def main():
         sys.stdout.buffer.write(struct.pack("=I", len(res)))
         sys.stdout.buffer.write(res)
         sys.stdout.flush()
-
-
-if __name__ == "__main__":
-    main()
