@@ -21,19 +21,20 @@ from fast_diff_match_patch import diff
 
 
 if __name__ == "__main__":
-    goodLineEndings = (b"\n", b"\r")
+    goodLineEndings = ("\n", "\r")
     while True:
         oldLen, newLen = struct.unpack("=II", sys.stdin.buffer.read(8))
         if not oldLen and not newLen:
             break  # sentinal value
-        oldText = sys.stdin.buffer.read(oldLen)
-        newText = sys.stdin.buffer.read(newLen)
-        res = b""
+        oldText = sys.stdin.buffer.read(oldLen).decode()
+        newText = sys.stdin.buffer.read(newLen).decode()
+        res = ""
         for op, text in diff(oldText, newText, counts_only=False):
             if op == "+":
                 res += text
                 if not text.endswith(goodLineEndings):
-                    res += b"\n"
+                    res += "\n"
+        res = res.encode()
         sys.stdout.buffer.write(struct.pack("=I", len(res)))
         sys.stdout.buffer.write(res)
         sys.stdout.flush()
